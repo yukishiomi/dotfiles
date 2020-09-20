@@ -20,3 +20,5 @@
   (write-region "" nil custom-file))
 ;; カスタムファイルを読み込む
 (load custom-file)
+
+(global-set-key (kbd "C-m") 'newline-and-indent)
