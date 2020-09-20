@@ -22,3 +22,15 @@
 (load custom-file)
 
 (global-set-key (kbd "C-m") 'newline-and-indent)
+;;  "C-t"でウィンドウを切り替える
+(global-set-key (kbd "C-t") 'other-window)
+;; 行番号を表示する
+(column-number-mode t)
+
+(setq frame-title-format "%f")
+(global-linum-mode t)
+;; 背景色をgray24に変更
+(set-face-background 'default "gray20")
+;; 文字の色を白に変更
+(set-face-foreground 'default "white")
+
