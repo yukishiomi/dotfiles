@@ -9,6 +9,17 @@
         (if (fboundp 'normal-top-level-add-subdirs-to-load-path)
             (normal-top-level-add-subdirs-to-load-path))))))
 
+(require 'package)
+(add-to-list 'package-archives '("marmalade" . "https://marmaladerepo.org/packages/"))
+(add-to-list 'package-archives '("melpa"."https://melpa.org/packages/"))
+(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+(add-to-list 'package-archives '("ELPA" . "http://tromey.com/elpa/") t)
+
+(package-initialize)
+
+;; Helm
+(require 'helm-config)
+
 ;; 引数のディレクトリとそのサブディレクトリをload-pathに追加
 ;; (add-to-load-path "elisp" "conf" "public_repos")
 
@@ -27,10 +38,23 @@
 ;; 行番号を表示する
 (column-number-mode t)
 
+
+
+
 (setq frame-title-format "%f")
 (global-linum-mode t)
 ;; 背景色をgray24に変更
 (set-face-background 'default "gray20")
 ;; 文字の色を白に変更
 (set-face-foreground 'default "white")
+
+;; バックアップとオートセーブファイルを~/.emacs.d/backupsに集める
+(add-to-list 'backup-directory-alist (cons "." "~/.emacs.d/backups/"))
+(setq auto-save-file-name-transforms `((".*", (expand-file-name "~/.emacs.d/backups/") t)))
+
+(setq auto-save-timeout 15)
+(global-auto-revert-mode t)
+
+(global-set-key (kbd "C-M-o") 'helm-occur)
+
 
