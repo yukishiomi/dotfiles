@@ -21,7 +21,7 @@
 (require 'helm-config)
 
 ;; 引数のディレクトリとそのサブディレクトリをload-pathに追加
-;; (add-to-load-path "elisp" "conf" "public_repos")
+;; ( "elisp" "conf" "public_repos")
 
 ;;; P63 Emacsが自動的に書き込む設定をcustom.elに保存する
 ;; カスタムファイルを別ファイルにする
@@ -42,8 +42,8 @@
 
 
 (setq frame-title-format "%f")
-(global-linum-mode t)
 ;; 背景色をgray24に変更
+(global-linum-mode t)
 (set-face-background 'default "gray20")
 ;; 文字の色を白に変更
 (set-face-foreground 'default "white")
@@ -57,4 +57,109 @@
 
 (global-set-key (kbd "C-M-o") 'helm-occur)
 
+(load-theme 'zenburn t)
+(global-set-key (kbd "M-y") 'helm-show-kill-ring)
 
+;; auto-compoleteの設定
+(when (require 'auto-complete-config nil t)
+  (define-key ac-mode-map (kbd "M-TAB") 'auto-complete)
+  (ac-config-default)
+  (setq ac-use-menu-map t)
+  (setq ac-ignore-case nil))
+
+(when (require 'color-moccur nil t)
+  (global-set-key (kbd "M-o") 'occur-by-moccur)
+  ;;　スペース区切りでAND検索
+  (setq moccur-split-word t)
+  ;; ディレクトリ検索の時除外するファイル
+  (add-to-list 'dmoccur-exclusion-mask "\\.DS_Store")
+  (add-to-list 'dmoccur-exclusion-mask "^#.+#$"))
+
+(when (require 'undohist nil t)
+  (undohist-initialize))
+
+(when (require 'undo-tree nil t)
+  (global-set-key (kbd "C-'") 'undo-tree-redo)
+  (global-undo-tree-mode))
+
+(when (require 'elscreen nil t)
+  (elscreen-start)
+  (if window-system
+      (define-key elscreen-map (kbd "C-z") 'iconify-or-deiconify-frame)
+      (define-key elscreen-map (kbd "C-z") 'suspend-emacs)))
+
+;; howmメモ保存の場所）
+(setq howm-directory (concat user-emacs-directory "howm"))
+;; howm-menuの言語を日本語に
+(setq howm-menu-lang 'ja)
+;; howmメモを一日一ファイルにする
+					; (setq howm-file-name-format "%Y/%m/%Y-%m-%d.howm")
+
+;; howm-modeを読み込む
+(when (require 'howm-mode nil t)
+  (global-set-key (kbd "C-c ,,") 'howm-menu))
+
+(defun howm-save-buffer-and-kill ()
+  (interactive)
+  (when (and (buffer-file-name)
+	     (howm-buffer-p))
+    (save-buffer)
+    (kill-buffer nil)))
+
+(define-key howm-mode-map (kbd "C-c C-c") 'howm-save-buffer-and-kill)
+
+;; cua-modeの設定
+(cua-mode t)
+(setq cua-enable-cua-keys nil)
+
+(require 'typescript-mode)
+(when (require 'web-mode nil t)
+  (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
+  (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode)))
+
+;; ruby-mode-hookにruby-electric-modeを追加
+(add-hook 'ruby-mode-hook #'ruby-electirc-mode)
+
+(add-hook 'after-init-hook #'global-flycheck-mode)
+			     
+(when (require 'web-mode' nil t)
+  ;; 自動的にweb-modeを起動したい拡張子を追加
+  (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode)))
+;; gtags-modeのキーバインドを有効化				  
+(setq gtags-suggested-key-mapping t)
+;; ファイル保存人い自動的にタグをアップデート
+(setq gtags-auto-update t)
+(require 'ctags nil t)
+(setq tags-revert-without-query t)
+(setq ctags-command "ctags -R --fields=\"+afikKlmnsSzt\" ")
+(global-set-key (kbd "<f5>") 'ctags-create-or-update-tags-table)
+(global-set-key (kbd "M-.") 'ctags-search)
+
+(setq rinari-tags-file-name "TAGS")
+
+(require 'gtags)
+(global-set-key "\M-t" 'helm-gtags-find-tag)
+(global-set-key "\M-r" 'helm-gtags-find-rtag)
+(global-set-key "\M-s" 'helm-gtags-find-symbol)
+(global-set-key "\C-t" 'helm-gtags-pop-stack)
+
+(when (require 'multi-term nil t)
+  (setq multi-term-program "/bin/zsh"))
+
+(add-to-list 'load-path "/usr/local/share/gtags")
+
+(setenv "PATH" (concat ".:/usr/local/bin" (getenv "PATH")))
+(add-to-list 'exec-path "/usr/local/bin/")
+
+;; gnu global support
+(add-to-list 'load-path "/usr/local/bin/global")
