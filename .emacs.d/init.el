@@ -160,6 +160,9 @@
   (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode)))
 
+;; rubyモードで挿入されるutf-8を取り消す
+(setq ruby-insert-encoding-magic-comment nil)
+
 (add-hook 'web-mode-hook
           (lambda ()
             (when (string-equal "tsx" (file-name-extension buffer-file-name))
