@@ -1,4 +1,3 @@
-;; P61 Elisp配置用のディレクトリを作成
 ;; load-pathを追加する関数を定義
 (defun add-to-load-path (&rest paths)
   (let (path)
@@ -28,7 +27,10 @@
 (add-hook 'before-save-hook 'tide-format-before-save)
 
 (add-hook 'typescript-mode-hook #'setup-tide-mode)
+; 保存しないファイルの正規表現
+(setq desktop-files-not-to-save "\\(^/[^/:]*:\\|\\.diary$\\)")
 
+(desktop-save-mode 1)
 (require 'package)
 (add-to-list 'package-archives '("marmalade" . "https://marmaladerepo.org/packages/"))
 (add-to-list 'package-archives '("melpa"."https://melpa.org/packages/"))
@@ -40,10 +42,10 @@
 ;; Helm
 (require 'helm-config)
 
+(require 'dired-x)
 ;; 引数のディレクトリとそのサブディレクトリをload-pathに追加
 ;; ( "elisp" "conf" "public_repos")
 
-;;; P63 Emacsが自動的に書き込む設定をcustom.elに保存する
 ;; カスタムファイルを別ファイルにする
 (setq custom-file (locate-user-emacs-file "custom.el"))
 ;; (カスタムファイルが存在しない場合は作成する
@@ -58,8 +60,9 @@
 ;; 行番号を表示する
 (column-number-mode t)
 
-
-
+;;; tramp(remote)ファイルは復元しない
+(setq save-visited-files-ignore-tramp-files t)
+(turn-on-save-visited-files-mode)
 
 (setq frame-title-format "%f")
 ;; 背景色をgray24に変更
@@ -145,7 +148,8 @@
 (add-hook 'ruby-mode-hook #'ruby-electirc-mode)
 
 (add-hook 'after-init-hook #'global-flycheck-mode)
-			     
+
+(require 'tide)
 (when (require 'web-mode' nil t)
   ;; 自動的にweb-modeを起動したい拡張子を追加
   (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
@@ -169,7 +173,26 @@
               (setup-tide-mode))))
 ;; configure jsx-tide checker to run after your default jsx checker
 (flycheck-add-mode 'javascript-eslint 'web-mode)
+(flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
 
+(setq web-mode-enable-auto-pairing t)
+(setq web-mode-enable-auto-closing t)
+(defun my-web-mode-hook ()
+	(setq web-mode-attr-indent-offset 2)
+	(setq web-mode-markup-indent-offset 2)
+	(setq web-mode-css-indent-offset 2)
+	(setq web-mode-code-indent-offset 2)
+	(setq indent-tabs-mode nil)
+	(setq tab-width 2))
+(add-hook 'web-mode-hook 'my-web-mode-hook)
+;; 括弧の自動補完
+(require 'smartparens)
+(smartparens-global-mode t)
+(setq-default sp-highlight-pair-overlay nil)    ;ハイライト機能削除
+
+;; インデント
+(electric-indent-mode t)
+(setq-default tab-width 2)
 ;; gtags-modeのキーバインドを有効化				  
 (setq gtags-suggested-key-mapping t)
 ;; ファイル保存人い自動的にタグをアップデート
@@ -197,3 +220,13 @@
 
 ;; gnu global support
 (add-to-list 'load-path "/usr/local/bin/global")
+
+(when (require 'projectile nil t)
+  (projectile-mode)
+  (add-to-list
+   'projectile-globally-ignored-directories "node-modules")
+  (setq projectile-enable-caching t))
+
+(when (require 'helm-projectile nil t)
+  (setq projectile-completion-system 'helm))
+
