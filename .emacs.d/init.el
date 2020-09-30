@@ -56,10 +56,11 @@
 
 (global-set-key (kbd "C-m") 'newline-and-indent)
 ;;  "C-t"でウィンドウを切り替える
-(global-set-key (kbd "C-t") 'other-window)
+(global-set-key (kbd "C-i") 'other-window)
 ;; 行番号を表示する
 (column-number-mode t)
 
+(global-set-key (kbd "C-x C-a") 'helm-ag)
 ;;; tramp(remote)ファイルは復元しない
 (setq save-visited-files-ignore-tramp-files t)
 (turn-on-save-visited-files-mode)
@@ -233,3 +234,17 @@
 (when (require 'helm-projectile nil t)
   (setq projectile-completion-system 'helm))
 
+(require 'god-mode)
+(god-mode)
+(global-set-key (kbd "<escape>") #'god-mode-all)
+
+(setq god-exempt-major-modes nil)
+(setq god-exempt-predicates nil)
+
+(defun my-god-mode-update-cursor ()
+  (setq cursor-type (if (or god-local-mode buffer-read-only)
+                        'box
+                      'bar)))
+
+(add-hook 'god-mode-enabled-hook #'my-god-mode-update-cursor)
+(add-hook 'god-mode-disabled-hook #'my-god-mode-update-cursor)
